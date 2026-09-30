@@ -1,31 +1,45 @@
 # Fourier Transform Project
 
-A mathematical modeling and data-analysis project originally created during **BYU Math Camp 2025** and later expanded into a more complete Python project.
+A Python project that explores **Fourier transforms, complex numbers, epicycles, and mathematical curve reconstruction**.
 
-The project explores ways of representing data mathematically by fitting polynomial functions to sets of coordinate data and evaluating how well different polynomial degrees describe the data.
+The main program takes a set of 2D points, interprets them as complex numbers, computes their Fourier transform, and uses the resulting Fourier coefficients to reconstruct the original shape using rotating vectors (epicycles).
 
-> **Note:** Despite the project name, the current implementation focuses primarily on polynomial regression and curve fitting. The repository originally grew from work involving Fourier analysis, but the current Python implementation does not perform a Fourier transform.
+The project also contains a separate **polynomial optimizer** for experimenting with polynomial regression and determining an appropriate polynomial degree using adjusted R².
 
 ---
 
 ## Features
 
-* Read coordinate data from `.dat` files
-* Plot and visualize datasets
-* Fit polynomial functions to data
-* Automatically test polynomial degrees from 1 through 6
-* Compare polynomial fits using multiple statistical measurements
-* Select the best polynomial degree using **adjusted R²**
-* Animate the progression of polynomial fits
-* Calculate:
+### Fourier Transform Visualizer
 
-  * Mean Squared Error (MSE)
+The main program:
+
+1. Loads a collection of 2D coordinate points.
+2. Converts each point into a complex number.
+3. Recenters and scales the path.
+4. Computes the Discrete Fourier Transform using NumPy.
+5. Sorts the resulting frequencies for epicycle visualization.
+6. Reconstructs the path using rotating complex vectors.
+7. Animates the epicycles drawing the original shape.
+8. Saves the resulting animation as an HTML file.
+9. Generates a Fourier-series representation of the function.
+
+### Polynomial Optimizer
+
+The `polynomial optimizer` directory contains a separate tool that:
+
+* Loads `(x, y)` data from `.dat` files.
+* Tests polynomial degrees from 1 through 6.
+* Calculates:
+
+  * Mean squared error (MSE)
   * Correlation
   * Direction correlation
   * R²
   * Adjusted R²
-* Output the resulting polynomial equation
-* Includes several example datasets and image-derived datasets
+* Selects the polynomial degree with the highest adjusted R².
+* Animates the polynomial fits as the degree increases.
+* Outputs the resulting polynomial.
 
 ---
 
@@ -43,327 +57,419 @@ Fourier-Transform-Project/
 │   ├── *.dat
 │   │
 │   └── images/
-│       └── source images
+│       ├── *.png
+│       ├── *.jpg
+│       └── *.svg
 │
-└── test_data/
-    └── example datasets
-```
-
-### `main.py`
-
-The main entry point for the project.
-
-It:
-
-1. Selects an input dataset.
-2. Loads the coordinate data.
-3. Tests polynomial fits of different degrees.
-4. Animates the fitting process.
-5. Determines the best polynomial degree.
-6. Calculates the final polynomial.
-7. Prints the resulting equation.
-
-The default input is:
-
-```python
-INPUT_FILE = "test_data/projectile_height_vs_time.dat"
-```
-
-To use a different dataset, change `INPUT_FILE`.
-
----
-
-### `funcs.py`
-
-Contains the primary mathematical and visualization functions used by the project.
-
-Important functions include:
-
-#### `read_file(filepath)`
-
-Reads a `.dat` file containing pairs of numerical coordinates.
-
-Example:
-
-```text
-0 0
-1 4
-2 7
-3 9
-```
-
-is interpreted as:
-
-```python
-[
-    [0, 0],
-    [1, 4],
-    [2, 7],
-    [3, 9]
-]
+└── polynomial optimizer/
+    ├── main.py
+    ├── funcs.py
+    │
+    └── test_data/
+        ├── arch_bridge_shape.dat
+        ├── ball_height_vs_time.dat
+        ├── cooling_coffee_temperature_vs_time.dat
+        ├── plant_growth_height_vs_time.dat
+        ├── projectile_height_vs_time.dat
+        ├── rocket_launch_altitude_vs_time.dat
+        ├── spring_applied_force_vs_displacement.dat
+        └── water_temperature_vs_time.dat
 ```
 
 ---
 
-#### `output_function(coeffs)`
+# Requirements
 
-Converts polynomial coefficients into a readable polynomial expression.
+The project uses Python and the following libraries:
 
-For example, coefficients representing
-
-```text
-2x² + 3x + 1
-```
-
-are converted into a string representation of the polynomial.
-
----
-
-#### `select_important_points(data, max_points=10)`
-
-Reduces a dataset to a smaller collection of significant points.
-
-The function:
-
-* Combines duplicate x-values
-* Averages their y-values
-* Preserves the first and last points
-* Identifies points with large changes in y
-* Checks whether the resulting y-values are strictly increasing
-
----
-
-#### `plot_polynomial(...)`
-
-Plots a polynomial and optionally displays the original dataset alongside it.
-
----
-
-#### `animate_polynomial_fit(data, max_degree)`
-
-The main analysis function.
-
-It tests polynomial degrees and calculates their statistical performance.
-
-The current implementation limits the tested polynomial degree to **6**.
-
-For each degree, it calculates:
-
-### Mean Squared Error
-
-MSE measures the average squared difference between the predicted and actual values.
-
-$$
-MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2
-$$
-
-Lower MSE indicates that the predictions are, on average, closer to the observed data.
-
-### R²
-
-R² measures how much of the variation in the data is explained by the model.
-
-$$
-R^2 = 1-\frac{SS_{res}}{SS_{tot}}
-$$
-
-### Adjusted R²
-
-Adjusted R² accounts for the number of parameters in the polynomial, helping prevent increasingly complicated polynomials from automatically appearing better simply because they have more degrees of freedom.
-
-$$
-\bar{R}^2 =
-1-(1-R^2)
-\frac{n-1}{n-p-1}
-$$
-
-where:
-
-* \(n\) is the number of observations
-* \(p\) is the polynomial degree
-
-The project uses **adjusted R² to select the best polynomial degree**.
-
----
-
-## Example Datasets
-
-The repository includes several datasets for testing mathematical models.
-
-### Physical / Mathematical Data
-
-Located in `test_data/`:
-
-* `projectile_height_vs_time.dat`
-* `ball_height_vs_time.dat`
-* `rocket_launch_altitude_vs_time.dat`
-* `cooling_coffee_temperature_vs_time.dat`
-* `water_temperature_vs_time.dat`
-* `plant_growth_height_vs_time.dat`
-* `spring_applied_force_vs_displacement.dat`
-* `arch_bridge_shape.dat`
-
-These datasets allow the program to be applied to different types of mathematical and physical relationships.
-
----
-
-## Image Data
-
-The `paths/` directory contains coordinate data generated from images.
-
-Example images include:
-
-* BYU Cougars logo
-* Among Us
-* Charizard
-* Christus
-* Pikachu
-* Yoshi
-* A star
-* Thumbs up
-* Circle of Peace
-* Priddis
-
-The corresponding `.dat` files contain coordinate information representing these shapes.
-
-This allows mathematical curve-fitting techniques to be experimented with on visual data as well as traditional scientific datasets.
-
----
-
-## Installation
-
-### Requirements
-
-The project requires Python and the following libraries:
-
-* NumPy
-* Matplotlib
+* [NumPy](https://numpy.org/)
+* [Matplotlib](https://matplotlib.org/)
+* [IPython](https://ipython.org/)
 
 Install the dependencies with:
 
 ```bash
-pip install numpy matplotlib
+pip install numpy matplotlib ipython
 ```
+
+Python 3.9+ is recommended.
 
 ---
 
+# Fourier Transform Visualizer
+
 ## Running the Project
 
-From the project directory, run:
+From the root project directory:
 
 ```bash
 python main.py
 ```
 
-The program will load the selected dataset and begin analyzing polynomial fits.
+The default input file is:
 
-The visualization will show the polynomial fits progressing through different degrees before displaying the selected best-fit polynomial.
+```text
+paths/circle_peace.dat
+```
 
-After the animation, the program prints the resulting polynomial equation.
+The program will process the path and create an animation using Fourier epicycles.
+
+The generated animation is saved as:
+
+```text
+animation.html
+```
+
+A Fourier representation of the reconstructed function is also written to:
+
+```text
+function.txt
+```
 
 ---
 
-## Using Your Own Data
+## Changing the Input Image
 
-Create a `.dat` file containing x/y coordinate pairs:
+The input path is selected in `main.py` through the configuration:
 
-```text
-0 1
-1 3
-2 7
-3 13
-4 21
+```python
+class config:
+    INPUT_FILE = BASE_DIR / "paths" / "circle_peace.dat"
 ```
 
-Then change:
+To use another path, change the filename.
+
+For example:
+
+```python
+INPUT_FILE = BASE_DIR / "paths" / "pikachu.dat"
+```
+
+The repository includes several example paths:
+
+* `BYU_Cougars_logo.dat`
+* `among_us.dat`
+* `charizard.dat`
+* `christus.dat`
+* `circle_peace.dat`
+* `pikachu.dat`
+* `priddis.dat`
+* `star.dat`
+* `thumbs_up.dat`
+* `yoshi.dat`
+
+The corresponding source images are located in:
+
+```text
+paths/images/
+```
+
+---
+
+# How the Fourier Transform Works
+
+A two-dimensional point
+
+```text
+(x, y)
+```
+
+can be represented as a complex number:
+
+```text
+z = x + yi
+```
+
+The entire path can therefore be represented as a sequence of complex numbers:
+
+```text
+z₀, z₁, z₂, ..., zₙ
+```
+
+The project applies the Discrete Fourier Transform to this sequence.
+
+Conceptually, the transform decomposes the path into rotating complex components:
+
+```text
+z(t) = Σ cₖ e^(2πikt)
+```
+
+where:
+
+* `cₖ` is a complex Fourier coefficient.
+* `k` is a frequency.
+* `t` is time.
+* `e^(2πikt)` represents a rotating vector.
+
+Each coefficient therefore corresponds to a rotating vector with:
+
+* **Magnitude** → the radius of the epicycle.
+* **Angle** → the initial rotation of the epicycle.
+* **Frequency** → how quickly the vector rotates.
+
+Adding all of these vectors together reconstructs the original path.
+
+---
+
+# Epicycle Animation
+
+The animation visualizes the Fourier decomposition directly.
+
+Each Fourier coefficient becomes a rotating vector. The vectors are chained together:
+
+```text
+Origin
+  │
+  ├── Vector 1
+  │       │
+  │       ├── Vector 2
+  │       │       │
+  │       │       └── Vector 3
+  │       │
+  │       └── ...
+```
+
+The endpoint of the final vector traces the reconstructed shape.
+
+The program also displays circles representing the radius of the rotating vectors.
+
+The number of vectors displayed is controlled by:
+
+```python
+MAX_EPICYCLES = 200
+```
+
+The number of circles rendered simultaneously can be controlled with:
+
+```python
+MAX_CIRCLES_RENDERED = 50
+```
+
+Increasing the number of epicycles generally improves the reconstruction, but also increases the amount of computation and visualization.
+
+---
+
+# Fourier Transform Implementation
+
+The Fourier transform is calculated with:
+
+```python
+def fft(data):
+    return np.fft.fft(data) / len(data)
+```
+
+The division by the number of points normalizes the Fourier coefficients.
+
+The frequencies are then reordered so that the animation processes them approximately in the order:
+
+```text
+0, 1, -1, 2, -2, 3, -3, ...
+```
+
+This makes the most visually significant low-frequency components appear first.
+
+---
+
+# Path Processing
+
+Before the Fourier transform is calculated, the coordinates are converted to complex numbers and normalized.
+
+The path is:
+
+1. Converted from `(x, y)` coordinates to complex values.
+2. Translated toward the origin.
+3. Scaled to fit the animation canvas.
+
+This allows input paths with different sizes and coordinate systems to be displayed consistently.
+
+---
+
+# Polynomial Optimizer
+
+The `polynomial optimizer` directory is an independent experiment involving polynomial regression.
+
+Run it with:
+
+```bash
+cd "polynomial optimizer"
+python main.py
+```
+
+The default dataset is:
+
+```text
+test_data/projectile_height_vs_time.dat
+```
+
+The program tests polynomial degrees from 1 through 6.
+
+---
+
+## Polynomial Degree Selection
+
+For each degree, the program calculates R²:
+
+```text
+R² = 1 - SS_res / SS_tot
+```
+
+It then calculates adjusted R²:
+
+```text
+Adjusted R² =
+1 - (1 - R²)(n - 1)/(n - p - 1)
+```
+
+where:
+
+* `n` = number of observations
+* `p` = number of predictors/parameters represented by the polynomial degree
+
+Adjusted R² is used instead of ordinary R² because ordinary R² generally increases as additional polynomial terms are added. Adjusted R² accounts for the additional model complexity.
+
+The degree with the highest adjusted R² is selected.
+
+---
+
+## Polynomial Test Data
+
+Several datasets are included for experimentation:
+
+| Dataset                                    | Example Application            |
+| ------------------------------------------ | ------------------------------ |
+| `arch_bridge_shape.dat`                    | Structural/architectural curve |
+| `ball_height_vs_time.dat`                  | Projectile motion              |
+| `cooling_coffee_temperature_vs_time.dat`   | Cooling behavior               |
+| `plant_growth_height_vs_time.dat`          | Growth over time               |
+| `projectile_height_vs_time.dat`            | Projectile motion              |
+| `rocket_launch_altitude_vs_time.dat`       | Launch trajectory              |
+| `spring_applied_force_vs_displacement.dat` | Spring behavior                |
+| `water_temperature_vs_time.dat`            | Temperature over time          |
+
+To test another dataset, change:
 
 ```python
 INPUT_FILE = "test_data/projectile_height_vs_time.dat"
 ```
 
-to the path of your dataset:
+in:
+
+```text
+polynomial optimizer/main.py
+```
+
+---
+
+# Data Format
+
+The `.dat` files contain two numerical columns:
+
+```text
+x y
+```
+
+For example:
+
+```text
+0.0 0.0
+1.0 4.5
+2.0 8.2
+3.0 10.1
+```
+
+The Fourier-transform datasets represent 2D paths.
+
+The polynomial-optimizer datasets represent ordinary `(x, y)` measurements.
+
+---
+
+# Output
+
+The Fourier transform program produces:
+
+### `animation.html`
+
+A self-contained HTML representation of the Matplotlib animation.
+
+It shows the Fourier epicycles reconstructing the input path.
+
+### `function.txt`
+
+A Fourier-series representation of the reconstructed path.
+
+It contains terms of the general form:
+
+```text
+(c)e^(ki2πt)
+```
+
+where `c` is a complex coefficient and `k` is the corresponding frequency.
+
+---
+
+# Configuration
+
+The main Fourier animation can be adjusted through the `config` class in `main.py`:
 
 ```python
-INPUT_FILE = "my_data/my_function.dat"
+class config:
+    CANVAS_SIZE = 10
+    ANIMATION_LOOP_TIME = 1
+    FRAMES_PER_SECOND = 240
+    MAX_CIRCLES_RENDERED = 50
+    MAX_EPICYCLES = 200
 ```
 
-Run:
+### `CANVAS_SIZE`
 
-```bash
-python main.py
-```
+Controls the size of the coordinate system.
 
-The program will automatically fit polynomial models to the data.
+### `ANIMATION_LOOP_TIME`
 
----
+Controls the intended animation duration in seconds.
 
-## Mathematical Goal
+### `FRAMES_PER_SECOND`
 
-A central goal of the project is to investigate how complicated a mathematical model needs to be to accurately describe a dataset.
+Controls animation resolution.
 
-Given a collection of points
+Higher values produce smoother animations but require more computation.
 
-$$
-(x_1,y_1),(x_2,y_2),\ldots,(x_n,y_n)
-$$
+### `MAX_CIRCLES_RENDERED`
 
-the program searches for a polynomial
+Controls how many epicycle circles are displayed.
 
-$$
-f(x)=a_nx^n+a_{n-1}x^{n-1}+\cdots+a_1x+a_0
-$$
+### `MAX_EPICYCLES`
 
-that provides a useful approximation of the data.
-
-Instead of simply choosing the polynomial with the smallest error, the project uses **adjusted R²** to account for model complexity.
-
-This makes it possible to investigate the tradeoff between:
-
-* Accuracy
-* Complexity
-* Overfitting
-* General mathematical representation
+Controls how many Fourier coefficients are used to reconstruct the path.
 
 ---
 
-## Background
+# Mathematical Purpose
 
-This project began as work during **BYU Math Camp 2025** and was subsequently expanded into a larger programming and mathematical modeling project.
+This project demonstrates how a seemingly complicated shape can be represented as a combination of simple periodic functions.
 
-The project combines concepts from:
+The central idea is:
 
-* Calculus
-* Linear algebra
-* Statistics
-* Numerical methods
-* Polynomial regression
-* Data visualization
-* Mathematical modeling
+> A complex path can be decomposed into many rotating vectors, and the sum of those vectors can reconstruct the original path.
 
-The original motivation involved exploring how complicated mathematical functions can be constructed from data. The project has since evolved to experiment with different methods of representing and analyzing mathematical relationships.
+This provides a visual demonstration of the Fourier transform and shows the relationship between:
 
----
+* Complex numbers
+* Periodic functions
+* Frequency
+* Fourier coefficients
+* Vector rotation
+* Signal reconstruction
+* Data approximation
 
-## Future Development
-
-Possible future directions include:
-
-* Implementing an actual Discrete Fourier Transform (DFT)
-* Adding Fast Fourier Transform (FFT) support
-* Comparing polynomial and Fourier representations
-* Visualizing Fourier coefficients
-* Reconstructing images using Fourier series
-* Adding frequency-domain visualizations
-* Improving automatic model selection
-* Supporting additional mathematical functions
-* Adding interactive dataset selection
-* Improving image-to-coordinate conversion
-* Comparing multiple model types automatically
+The polynomial optimizer provides a related exploration of mathematical modeling by demonstrating how increasingly complex polynomial functions can approximate measured data.
 
 ---
 
-## Credits
+# Credits and Inspiration
 
 **Created by Evan Hill**
 
-This is a personal programming and mathematics project, with the original concept developing from a BYU math camp project in 2025.
+The project was created as an exploration of computational mathematics, Fourier analysis, data visualization, and mathematical curve reconstruction. It was inspired by a BYU math camp project in 2025.
+
+---
